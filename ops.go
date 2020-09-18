@@ -96,6 +96,10 @@ func (d *Dir) DirExists(elems ...string) (bool, error) {
 	return afero.DirExists(d.fs, d.Path(elems...))
 }
 
+func (d *Dir) Exists(elems ...string) (bool, error) {
+	return afero.Exists(d.fs, d.Path(elems...))
+}
+
 func (d *Dir) IsEmpty(elems ...string) (bool, error) {
 	return afero.IsEmpty(d.fs, d.Path(elems...))
 }

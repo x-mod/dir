@@ -16,6 +16,7 @@ func TestDir_Open(t *testing.T) {
 		Folder("child2/a"),
 		Folder("child2/b"),
 		Folder("child2", "c", "c", "d"),
+		Folder("child3"),
 	)
 	assert.Nil(t, dir.Open())
 	exist, err := dir.DirExists("child")
@@ -25,4 +26,13 @@ func TestDir_Open(t *testing.T) {
 	log.Println("folders:", folders)
 	assert.Nil(t, err)
 	assert.Equal(t, 3, len(folders))
+
+	folders3, err := dir.Folders("child3")
+	log.Println("folders:", folders3)
+	assert.Nil(t, err)
+	assert.Equal(t, 0, len(folders3))
+
+	exist2, err := dir.Exists("child2", "a", "filename")
+	assert.Nil(t, err)
+	assert.Equal(t, false, exist2)
 }

@@ -29,9 +29,9 @@ func Root(root string) Option {
 	}
 }
 
-func Folder(folder string) Option {
+func Folder(elems ...string) Option {
 	return func(d *Dir) {
-		d.folders = append(d.folders, folder)
+		d.folders = append(d.folders, filepath.Join(elems...))
 	}
 }
 

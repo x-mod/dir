@@ -104,6 +104,14 @@ func (d *Dir) IsEmpty(elems ...string) (bool, error) {
 	return afero.IsEmpty(d.fs, d.Path(elems...))
 }
 
+func (d *Dir) Remove(elems ...string) error {
+	return d.fs.Remove(d.Path(elems...))
+}
+
+func (d *Dir) RemoveAll(elems ...string) error {
+	return d.fs.RemoveAll(d.Path(elems...))
+}
+
 func (d *Dir) Folders(elems ...string) ([]string, error) {
 	infos, err := afero.ReadDir(d.fs, d.Path(elems...))
 	if err != nil {

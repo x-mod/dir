@@ -35,4 +35,7 @@ func TestDir_Open(t *testing.T) {
 	exist2, err := dir.Exists("child2", "a", "filename")
 	assert.Nil(t, err)
 	assert.Equal(t, false, exist2)
+
+	assert.NotNil(t, dir.Remove("child2"))
+	assert.Nil(t, dir.RemoveAll("child2"))
 }

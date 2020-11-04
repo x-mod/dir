@@ -125,3 +125,10 @@ func (d *Dir) Folders(elems ...string) ([]string, error) {
 	}
 	return dirs, nil
 }
+
+func (d *Dir) SymLink(source string, target string) error {
+	if symlink, ok := d.fs.(afero.Symlinker); ok {
+		return symlink.SymlinkIfPossible(source, target)
+	}
+	return fmt.Errorf("unsupport symlinker")
+}

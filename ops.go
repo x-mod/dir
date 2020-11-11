@@ -132,3 +132,7 @@ func (d *Dir) SymLink(source string, target string) error {
 	}
 	return fmt.Errorf("unsupport symlinker")
 }
+
+func (d *Dir) Stat(elems ...string) (os.FileInfo, error) {
+	return d.fs.Stat(d.Path(elems...))
+}

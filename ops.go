@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"syscall"
 
 	"github.com/spf13/afero"
 )
@@ -131,6 +132,10 @@ func (d *Dir) SymLink(source string, target string) error {
 		return symlink.SymlinkIfPossible(source, target)
 	}
 	return fmt.Errorf("unsupport symlinker")
+}
+
+func (d *Dir) Unlink(elems ...string) error {
+	return syscall.Unlink(d.Path(elems...))
 }
 
 func (d *Dir) Stat(elems ...string) (os.FileInfo, error) {

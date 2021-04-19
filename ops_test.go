@@ -32,6 +32,8 @@ func TestDir_Open(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, 0, len(folders3))
 
+	log.Println("path:", dir.Path("a", "b", "../c/index.md"))
+
 	exist2, err := dir.Exists("child2", "a", "filename")
 	assert.Nil(t, err)
 	assert.Equal(t, false, exist2)

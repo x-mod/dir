@@ -127,6 +127,20 @@ func (d *Dir) Folders(elems ...string) ([]string, error) {
 	return dirs, nil
 }
 
+func (d *Dir) Files(elems ...string) ([]string, error) {
+	infos, err := afero.ReadDir(d.fs, d.Path(elems...))
+	if err != nil {
+		return nil, err
+	}
+	files := []string{}
+	for _, info := range infos {
+		if !info.IsDir() {
+			files = append(files, info.Name())
+		}
+	}
+	return files, nil
+}
+
 func (d *Dir) SymLink(source string, target string) error {
 	if symlink, ok := d.fs.(afero.Symlinker); ok {
 		return symlink.SymlinkIfPossible(source, target)

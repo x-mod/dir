@@ -1,13 +1,18 @@
 package dir
 
 import (
+	"embed"
 	"fmt"
+	"io"
 	"os"
+	"path"
 	"path/filepath"
 	"syscall"
 
 	"github.com/spf13/afero"
 )
+
+var EmbedFS embed.FS
 
 type Dir struct {
 	root       string
@@ -154,4 +159,44 @@ func (d *Dir) Unlink(elems ...string) error {
 
 func (d *Dir) Stat(elems ...string) (os.FileInfo, error) {
 	return d.fs.Stat(d.Path(elems...))
+}
+
+func (d *Dir) Embed(elems ...string) error {
+	if _, err := d.Mkdir(elems...); err != nil {
+		return err
+	}
+	entries, err := EmbedFS.ReadDir(path.Join(elems...))
+	if err != nil {
+		return err
+	}
+	for _, entry := range entries {
+		dst := []string{}
+		dst = append(dst, elems...)
+		dst = append(dst, entry.Name())
+		if entry.IsDir() {
+			if err := d.Embed(dst...); err != nil {
+				return err
+			}
+			continue
+		}
+		exist, err := d.Exists(dst...)
+		if err != nil {
+			return err
+		}
+		if exist {
+			continue
+		}
+		wr, err := os.Create(d.Path(dst...))
+		if err != nil {
+			return fmt.Errorf("file <%s> create: %w", path.Join(dst...), err)
+		}
+		rd, err := EmbedFS.Open(path.Join(dst...))
+		if err != nil {
+			return fmt.Errorf("file <%s> open: %w", path.Join(dst...), err)
+		}
+		if _, err := io.Copy(wr, rd); err != nil {
+			return fmt.Errorf("file <%s> write: %w", path.Join(dst...), err)
+		}
+	}
+	return nil
 }

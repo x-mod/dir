@@ -160,9 +160,14 @@ func (d *Dir) Unlink(elems ...string) error {
 func (d *Dir) Stat(elems ...string) (os.FileInfo, error) {
 	return d.fs.Stat(d.Path(elems...))
 }
-
 func (d *Dir) Embed(elems ...string) error {
-	if _, err := d.Mkdir(elems...); err != nil {
+	return d.EmbedSkip(0, elems...)
+}
+func (d *Dir) EmbedSkip(skip int, elems ...string) error {
+	if skip > len(elems) {
+		return fmt.Errorf("skip <%d> exceed elements length.", skip)
+	}
+	if _, err := d.Mkdir(elems[skip:]...); err != nil {
 		return err
 	}
 	entries, err := EmbedFS.ReadDir(path.Join(elems...))
@@ -174,21 +179,21 @@ func (d *Dir) Embed(elems ...string) error {
 		dst = append(dst, elems...)
 		dst = append(dst, entry.Name())
 		if entry.IsDir() {
-			if err := d.Embed(dst...); err != nil {
+			if err := d.EmbedSkip(skip, dst...); err != nil {
 				return err
 			}
 			continue
 		}
-		exist, err := d.Exists(dst...)
+		exist, err := d.Exists(dst[skip:]...)
 		if err != nil {
 			return err
 		}
 		if exist {
 			continue
 		}
-		wr, err := os.Create(d.Path(dst...))
+		wr, err := os.Create(d.Path(dst[skip:]...))
 		if err != nil {
-			return fmt.Errorf("file <%s> create: %w", path.Join(dst...), err)
+			return fmt.Errorf("file <%s> create: %w", path.Join(dst[skip:]...), err)
 		}
 		rd, err := EmbedFS.Open(path.Join(dst...))
 		if err != nil {

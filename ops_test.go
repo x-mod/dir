@@ -1,11 +1,15 @@
 package dir
 
 import (
+	"embed"
 	"log"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
+
+//go:embed test/child/embed/*
+var tembed embed.FS
 
 func TestDir_Open(t *testing.T) {
 	dir := New(
@@ -40,4 +44,10 @@ func TestDir_Open(t *testing.T) {
 
 	assert.NotNil(t, dir.Remove("child2"))
 	assert.Nil(t, dir.RemoveAll("child2"))
+
+	EmbedFS = tembed
+	emdir := New(Root("./test/dst"))
+
+	assert.Nil(t, emdir.Embed("test", "child", "embed"))
+	assert.Nil(t, emdir.EmbedSkip(3, "test", "child", "embed"))
 }

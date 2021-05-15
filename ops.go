@@ -18,6 +18,7 @@ type Dir struct {
 	root       string
 	folders    []string
 	createMode os.FileMode
+	forceEmbed bool
 	fs         afero.Fs
 }
 
@@ -32,6 +33,12 @@ func CreateMode(mode os.FileMode) Option {
 func Root(root string) Option {
 	return func(d *Dir) {
 		d.root = root
+	}
+}
+
+func ForceEmbed(v bool) Option {
+	return func(d *Dir) {
+		d.forceEmbed = v
 	}
 }
 
@@ -188,7 +195,7 @@ func (d *Dir) EmbedSkip(skip int, elems ...string) error {
 		if err != nil {
 			return err
 		}
-		if exist {
+		if exist && !d.forceEmbed {
 			continue
 		}
 		wr, err := os.Create(d.Path(dst[skip:]...))
